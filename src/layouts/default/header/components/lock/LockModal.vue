@@ -30,10 +30,9 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { BasicModal, useModalInner } from '/@/components/Modal/index';
   import { BasicForm, useForm } from '/@/components/Form/index';
-
-  import { useUserStore } from '/@/store/modules/user';
   import { useLockStore } from '/@/store/modules/lock';
   import headerImg from '/@/assets/images/header.jpg';
+  import { useAppStore } from '/@/store/modules/app';
   export default defineComponent({
     name: 'LockModal',
     components: { BasicModal, BasicForm },
@@ -41,10 +40,9 @@
     setup() {
       const { t } = useI18n();
       const { prefixCls } = useDesign('header-lock-modal');
-      const userStore = useUserStore();
       const lockStore = useLockStore();
-
-      const getRealName = computed(() => userStore.getUserInfo?.realName);
+      const appStore = useAppStore();
+      const getRealName = computed(() => appStore.currentUser?.name);
       const [register, { closeModal }] = useModalInner();
 
       const [registerForm, { validateFields, resetFields }] = useForm({
@@ -72,8 +70,7 @@
       }
 
       const avatar = computed(() => {
-        const { avatar } = userStore.getUserInfo;
-        return avatar || headerImg;
+        return headerImg;
       });
 
       return {

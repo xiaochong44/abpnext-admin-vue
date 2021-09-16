@@ -372,7 +372,7 @@
     }
 
     .ant-table-wrapper {
-      padding: 6px;
+      padding: 16px;
       background-color: @component-background;
       border-radius: 2px;
 

@@ -1,7 +1,6 @@
 /**
  * Multi-language related operations
  */
-import type { LocaleType } from '/#/config';
 
 import moment from 'moment';
 
@@ -9,6 +8,8 @@ import { i18n } from './setupI18n';
 import { useLocaleStoreWithOut } from '/@/store/modules/locale';
 import { unref, computed } from 'vue';
 import { loadLocalePool, setHtmlPageLang } from './helper';
+import { LocaleType } from '/#/config';
+import { initAbpConfig } from '../abp/initAbpConfig';
 
 interface LangModule {
   message: Recordable;
@@ -45,12 +46,13 @@ export function useLocale() {
     if (currentLocale === locale) {
       return locale;
     }
-
     if (loadLocalePool.includes(locale)) {
       setI18nLanguage(locale);
+      await initAbpConfig();
       return locale;
     }
-    const langModule = ((await import(`./lang/${locale}.ts`)) as any).default as LangModule;
+    const langModule = ((await import(`./lang/${locale.replace('-', '_')}.ts`)) as any)
+      .default as LangModule;
     if (!langModule) return;
 
     const { message, momentLocale, momentLocaleName } = langModule;
@@ -60,6 +62,7 @@ export function useLocale() {
     loadLocalePool.push(locale);
 
     setI18nLanguage(locale);
+    await initAbpConfig();
     return locale;
   }
 

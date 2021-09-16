@@ -10,7 +10,29 @@ import {
 
 import { CacheTypeEnum } from '/@/enums/cacheEnum';
 
-export type LocaleType = 'zh_CN' | 'en' | 'ru' | 'ja' | 'ko';
+export type LocaleType =
+  | 'zh_CN'
+  | 'en'
+  | 'ar'
+  | 'cs'
+  | 'de-DE'
+  | 'en-GB'
+  | 'es'
+  | 'fi'
+  | 'fr'
+  | 'hi'
+  | 'hu'
+  | 'it'
+  | 'nl'
+  | 'pl-PL'
+  | 'pt-BR'
+  | 'ru'
+  | 'sk'
+  | 'sl'
+  | 'tr'
+  | 'vi'
+  | 'zh-Hans'
+  | 'zh-Hant';
 
 export interface MenuSetting {
   bgColor: string;
@@ -64,8 +86,6 @@ export interface LocaleSetting {
   locale: LocaleType;
   // default language
   fallback: LocaleType;
-  // available Locales
-  availableLocales: LocaleType[];
 }
 
 export interface TransitionSetting {

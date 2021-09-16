@@ -8,13 +8,14 @@ import { VAxios } from './Axios';
 import { checkStatus } from './checkStatus';
 import { useGlobSetting } from '/@/hooks/setting';
 import { useMessage } from '/@/hooks/web/useMessage';
-import { RequestEnum, ResultEnum, ContentTypeEnum } from '/@/enums/httpEnum';
+import { RequestEnum, ContentTypeEnum, HttpStatus } from '/@/enums/httpEnum';
 import { isString } from '/@/utils/is';
-import { getToken } from '/@/utils/auth';
 import { setObjToUrlParams, deepMerge } from '/@/utils';
 import { useErrorLogStoreWithOut } from '/@/store/modules/errorLog';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { joinTimestamp, formatRequestDate } from './helper';
+import { useAppStore } from '/@/store/modules/app';
+import { useLocaleStoreWithOut } from '/@/store/modules/locale';
 
 const globSetting = useGlobSetting();
 const urlPrefix = globSetting.urlPrefix;
@@ -41,30 +42,22 @@ const transform: AxiosTransform = {
     }
     // 错误的时候返回
 
-    const { data } = res;
-    if (!data) {
-      // return '[HTTP] Request has no return value';
-      throw new Error(t('sys.api.apiRequestFailed'));
-    }
     //  这里 code，result，message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
-    const { code, result, message } = data;
-
-    // 这里逻辑可以根据项目进行修改
-    const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS;
-    if (hasSuccess) {
-      return result;
+    const { data, status } = res;
+    if (status == HttpStatus.Ok || status == HttpStatus.NoContent) {
+      return data;
     }
 
     // 在此处根据自己项目的实际情况对不同的code执行不同的操作
     // 如果不希望中断当前请求，请return数据，否则直接抛出异常即可
     let timeoutMsg = '';
-    switch (code) {
-      case ResultEnum.TIMEOUT:
+    switch (status) {
+      case HttpStatus.RequestTimeout:
         timeoutMsg = t('sys.api.timeoutMessage');
         break;
       default:
-        if (message) {
-          timeoutMsg = message;
+        if (data.message) {
+          timeoutMsg = data.message;
         }
     }
 
@@ -131,14 +124,18 @@ const transform: AxiosTransform = {
   /**
    * @description: 请求拦截器处理
    */
-  requestInterceptors: (config, options) => {
+  requestInterceptors: (config) => {
     // 请求之前处理config
-    const token = getToken();
-    if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
+    const app = useAppStore();
+    if (app.token) {
       // jwt token
-      config.headers.Authorization = options.authenticationScheme
-        ? `${options.authenticationScheme} ${token}`
-        : token;
+      config.headers['Authorization'] = 'Bearer ' + app.token;
+    }
+    if (!config.headers['Accept-Language']) {
+      config.headers['Accept-Language'] = useLocaleStoreWithOut().getLocale;
+    }
+    if (app.tenantId && app.multiTenancy && app.multiTenancy.isEnabled) {
+      config.headers['__tenant'] = app.tenantId;
     }
     return config;
   },
@@ -179,7 +176,7 @@ const transform: AxiosTransform = {
         }
         return Promise.reject(error);
       }
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error);
     }
 

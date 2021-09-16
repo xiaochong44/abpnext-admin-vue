@@ -8,7 +8,7 @@ declare module 'vue-router' {
     // Whether to ignore permissions
     ignoreAuth?: boolean;
     // role info
-    roles?: RoleEnum[];
+    permission?: string[] | string;
     // Whether not to cache
     ignoreKeepAlive?: boolean;
     // Is it fixed on tab
@@ -31,7 +31,7 @@ declare module 'vue-router' {
     // Never show in tab
     hideTab?: boolean;
     // Never show in menu
-    hideMenu?: boolean;
+    hideMenu?: boolean | (() => boolean);
     isLink?: boolean;
     // only build for Menu
     ignoreRoute?: boolean;

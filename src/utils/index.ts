@@ -39,6 +39,14 @@ export function deepMerge<T = any>(src: any = {}, target: any = {}): T {
   }
   return src;
 }
+export function interpolate(text, params) {
+  return text
+    .replace(/(['"]?\{\s*(\d+)\s*\}['"]?)/g, (_, match, digit) => {
+      let _a;
+      return (_a = params[digit]) !== null && _a !== void 0 ? _a : match;
+    })
+    .replace(/\s+/g, ' ');
+}
 
 export function openWindow(
   url: string,

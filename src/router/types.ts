@@ -46,7 +46,7 @@ export interface Menu {
 
   tag?: MenuTag;
 
-  hideMenu?: boolean;
+  hideMenu?: boolean | (() => boolean);
 }
 
 export interface MenuModule {

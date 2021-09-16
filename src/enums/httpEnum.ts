@@ -7,7 +7,20 @@ export enum ResultEnum {
   TIMEOUT = 401,
   TYPE = 'success',
 }
-
+export enum HttpStatus {
+  Ok = 200,
+  NoContent = 204,
+  Created = 201,
+  Accepted = 202,
+  BadRequest = 400,
+  Unauthorized = 401,
+  NotFound = 404,
+  RequestTimeout = 408,
+  ServerError = 500,
+  BadGateway = 502,
+  ServiceUnavailable = 503,
+  GatewayTimeout = 504,
+}
 /**
  * @description: request method
  */

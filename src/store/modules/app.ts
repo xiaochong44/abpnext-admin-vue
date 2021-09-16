@@ -16,6 +16,15 @@ import { Persistent } from '/@/utils/cache/persistent';
 import { darkMode } from '/@/settings/designSetting';
 import { resetRouter } from '/@/router';
 import { deepMerge } from '/@/utils';
+import {
+  ApplicationAuthConfigurationDto,
+  ApplicationConfigurationDto,
+  ApplicationFeatureConfigurationDto,
+  ApplicationLocalizationConfigurationDto,
+  ApplicationSettingConfigurationDto,
+  CurrentUserDto,
+} from '/@/api/abpconfig/model';
+import { CurrentTenantDto, MultiTenancyInfoDto } from '/@/api/abpconfig/model/multi-tenancy';
 
 interface AppState {
   darkMode?: ThemeEnum;
@@ -25,6 +34,9 @@ interface AppState {
   projectConfig: ProjectConfig | null;
   // When the window shrinks, remember some states, and restore these states when the window is restored
   beforeMiniInfo: BeforeMiniState;
+  token?: string;
+  tenantId?: string;
+  abpConfig: ApplicationConfigurationDto;
 }
 let timeId: TimeoutHandle;
 export const useAppStore = defineStore({
@@ -34,6 +46,9 @@ export const useAppStore = defineStore({
     pageLoading: false,
     projectConfig: Persistent.getLocal(PROJ_CFG_KEY),
     beforeMiniInfo: {},
+    abpConfig: {} as any,
+    token: undefined,
+    tenantId: undefined,
   }),
   getters: {
     getPageLoading(): boolean {
@@ -62,6 +77,30 @@ export const useAppStore = defineStore({
     },
     getMultiTabsSetting(): MultiTabsSetting {
       return this.getProjectConfig.multiTabsSetting;
+    },
+    isLogined(): boolean {
+      return this.abpConfig.currentUser && this.abpConfig.currentUser.isAuthenticated;
+    },
+    currentUser(): CurrentUserDto {
+      return this.abpConfig.currentUser;
+    },
+    localization(): ApplicationLocalizationConfigurationDto {
+      return this.abpConfig.localization;
+    },
+    setting(): ApplicationSettingConfigurationDto {
+      return this.abpConfig.setting;
+    },
+    features(): ApplicationFeatureConfigurationDto {
+      return this.abpConfig.features;
+    },
+    auth(): ApplicationAuthConfigurationDto {
+      return this.abpConfig.auth;
+    },
+    multiTenancy(): MultiTenancyInfoDto {
+      return this.abpConfig.multiTenancy;
+    },
+    currentTenant(): CurrentTenantDto {
+      return this.abpConfig.currentTenant;
     },
   },
   actions: {

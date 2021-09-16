@@ -35,6 +35,7 @@
 
   import { REDIRECT_NAME } from '/@/router/constant';
   import { getAllParentPath } from '/@/router/helper/menuHelper';
+  import { useAbp } from '/@/hooks/abp/useAbp';
 
   export default defineComponent({
     name: 'LayoutBreadcrumb',
@@ -48,8 +49,14 @@
       const { prefixCls } = useDesign('layout-breadcrumb');
       const { getShowBreadCrumbIcon } = useRootSetting();
       const go = useGo();
-
-      const { t } = useI18n();
+      const l = useAbp().getLocalization;
+      const t = function (value: string) {
+        if (value.indexOf('::') >= 0) {
+          return l(value);
+        } else {
+          return useI18n().t(value);
+        }
+      };
       watchEffect(async () => {
         if (currentRoute.value.name === REDIRECT_NAME) return;
         const menus = await getMenus();

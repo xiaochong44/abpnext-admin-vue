@@ -22,10 +22,10 @@
               class="w-1/2 -mt-16 -enter-x"
             />
             <div class="mt-10 font-medium text-white -enter-x">
-              <span class="inline-block mt-4 text-3xl"> {{ t('sys.login.signInTitle') }}</span>
+              <span class="inline-block mt-4 text-3xl">{{ l('::Welcome') }}</span>
             </div>
             <div class="mt-5 font-normal text-white text-md dark:text-gray-500 -enter-x">
-              {{ t('sys.login.signInDesc') }}
+              {{ l('::LongWelcomeMessage') }}
             </div>
           </div>
         </div>
@@ -51,10 +51,6 @@
             "
           >
             <LoginForm />
-            <ForgetPasswordForm />
-            <RegisterForm />
-            <MobileForm />
-            <QrCodeForm />
           </div>
         </div>
       </div>
@@ -74,6 +70,7 @@
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useLocaleStore } from '/@/store/modules/locale';
+  import { useAbp } from '/@/hooks/abp/useAbp';
 
   defineProps({
     sessionTimeout: {
@@ -83,10 +80,11 @@
 
   const globSetting = useGlobSetting();
   const { prefixCls } = useDesign('login');
-  const { t } = useI18n();
+  //const { t } = useI18n();
   const localeStore = useLocaleStore();
   const showLocale = localeStore.getShowPicker;
   const title = computed(() => globSetting?.title ?? '');
+  const l = useAbp().getLocalization;
 </script>
 <style lang="less">
   @prefix-cls: ~'@{namespace}-login';

@@ -1,39 +1,35 @@
 import type { Router, RouteRecordRaw } from 'vue-router';
 
 import { usePermissionStoreWithOut } from '/@/store/modules/permission';
+import { useAppStore } from '/@/store/modules/app';
 
 import { PageEnum } from '/@/enums/pageEnum';
 import { useUserStoreWithOut } from '/@/store/modules/user';
 
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 
-import { RootRoute } from '/@/router/routes';
-
 const LOGIN_PATH = PageEnum.BASE_LOGIN;
-
-const ROOT_PATH = RootRoute.path;
 
 const whitePathList: PageEnum[] = [LOGIN_PATH];
 
 export function createPermissionGuard(router: Router) {
   const userStore = useUserStoreWithOut();
+  const appStore = useAppStore();
   const permissionStore = usePermissionStoreWithOut();
   router.beforeEach(async (to, from, next) => {
-    if (
-      from.path === ROOT_PATH &&
-      to.path === PageEnum.BASE_HOME &&
-      userStore.getUserInfo.homePath &&
-      userStore.getUserInfo.homePath !== PageEnum.BASE_HOME
-    ) {
-      next(userStore.getUserInfo.homePath);
-      return;
-    }
-
-    const token = userStore.getToken;
+    // if (
+    //   from.path === ROOT_PATH &&
+    //   to.path === PageEnum.BASE_HOME &&
+    //   userStore.getUserInfo.homePath &&
+    //   userStore.getUserInfo.homePath !== PageEnum.BASE_HOME
+    // ) {
+    //   next(userStore.getUserInfo.homePath);
+    //   return;
+    // }
 
     // Whitelist can be directly entered
     if (whitePathList.includes(to.path as PageEnum)) {
-      if (to.path === LOGIN_PATH && token) {
+      if (to.path === LOGIN_PATH && appStore.isLogined) {
         const isSessionTimeout = userStore.getSessionTimeout;
         try {
           await userStore.afterLoginAction();
@@ -48,7 +44,7 @@ export function createPermissionGuard(router: Router) {
     }
 
     // token does not exist
-    if (!token) {
+    if (!appStore.isLogined) {
       // You can access without permission. You need to set the routing meta.ignoreAuth to true
       if (to.meta.ignoreAuth) {
         next();
@@ -74,20 +70,10 @@ export function createPermissionGuard(router: Router) {
     if (
       from.path === LOGIN_PATH &&
       to.name === PAGE_NOT_FOUND_ROUTE.name &&
-      to.fullPath !== (userStore.getUserInfo.homePath || PageEnum.BASE_HOME)
+      to.fullPath !== PageEnum.BASE_HOME
     ) {
-      next(userStore.getUserInfo.homePath || PageEnum.BASE_HOME);
+      next(PageEnum.BASE_HOME);
       return;
-    }
-
-    // get userinfo while last fetch time is empty
-    if (userStore.getLastUpdateTime === 0) {
-      try {
-        await userStore.getUserInfoAction();
-      } catch (err) {
-        next();
-        return;
-      }
     }
 
     if (permissionStore.getIsDynamicAddedRoute) {

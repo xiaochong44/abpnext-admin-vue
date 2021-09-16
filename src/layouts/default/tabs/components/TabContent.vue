@@ -21,6 +21,7 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useTabDropdown } from '../useTabDropdown';
+  import { useAbp } from '/@/hooks/abp/useAbp';
 
   export default defineComponent({
     name: 'TabContent',
@@ -34,8 +35,14 @@
     },
     setup(props) {
       const { prefixCls } = useDesign('multiple-tabs-content');
-      const { t } = useI18n();
-
+      const l = useAbp().getLocalization;
+      const t = function (value: string) {
+        if (value.indexOf('::') >= 0) {
+          return l(value);
+        } else {
+          return useI18n().t(value);
+        }
+      };
       const getTitle = computed(() => {
         const { tabItem: { meta } = {} } = props;
         return meta && t(meta.title as string);

@@ -24,7 +24,10 @@
   import { Dropdown } from '/@/components/Dropdown';
   import { Icon } from '/@/components/Icon';
   import { useLocale } from '/@/locales/useLocale';
-  import { localeList } from '/@/settings/localeSetting';
+  //import { localeList } from '/@/settings/localeSetting';
+  import { useAppStore } from '/@/store/modules/app';
+
+  const appStore = useAppStore();
 
   const props = defineProps({
     /**
@@ -37,25 +40,25 @@
     reload: { type: Boolean },
   });
 
-  const selectedKeys = ref<string[]>([]);
+  const selectedKeys = computed(() => {
+    return [appStore.localization.currentCulture.cultureName];
+  });
 
   const { changeLocale, getLocale } = useLocale();
 
-  const getLocaleText = computed(() => {
-    const key = selectedKeys.value[0];
-    if (!key) {
-      return '';
-    }
-    return localeList.find((item) => item.event === key)?.text;
-  });
-
-  watchEffect(() => {
-    selectedKeys.value = [unref(getLocale)];
+  const getLocaleText = computed(() => appStore.localization.currentCulture.displayName);
+  const localeList = computed(() => {
+    return appStore.localization.languages.map((x) => {
+      return {
+        text: x.displayName,
+        event: x.cultureName,
+      };
+    });
   });
 
   async function toggleLocale(lang: LocaleType | string) {
     await changeLocale(lang as LocaleType);
-    selectedKeys.value = [lang as string];
+    //selectedKeys.value = [lang as string];
     props.reload && location.reload();
   }
 

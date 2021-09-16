@@ -203,11 +203,7 @@ export function useDataSource(
     if (!api || !isFunction(api)) return;
     try {
       setLoading(true);
-      const { pageField, sizeField, listField, totalField } = Object.assign(
-        {},
-        FETCH_SETTING,
-        fetchSetting,
-      );
+      const { listField, totalField } = Object.assign({}, FETCH_SETTING, fetchSetting);
       let pageParams: Recordable = {};
 
       const { current = 1, pageSize = PAGE_SIZE } = unref(getPaginationInfo) as PaginationProps;
@@ -215,8 +211,8 @@ export function useDataSource(
       if ((isBoolean(pagination) && !pagination) || isBoolean(getPaginationInfo)) {
         pageParams = {};
       } else {
-        pageParams[pageField] = (opt && opt.page) || current;
-        pageParams[sizeField] = pageSize;
+        pageParams['skipCount'] = (((opt && opt.page) || current) - 1) * pageSize;
+        pageParams['maxResultCount'] = pageSize;
       }
 
       const { sortInfo = {}, filterInfo } = searchState;

@@ -14,6 +14,7 @@ import { setupStore } from '/@/store';
 import { setupGlobDirectives } from '/@/directives';
 import { setupI18n } from '/@/locales/setupI18n';
 import { registerGlobComp } from '/@/components/registerGlobComp';
+import { initAbpConfig } from '/@/abp/initAbpConfig';
 
 // Importing on demand in local development will increase the number of browser requests by around 20%.
 // This may slow down the browser refresh speed.
@@ -24,10 +25,10 @@ if (import.meta.env.DEV) {
 
 async function bootstrap() {
   const app = createApp(App);
-
   // Configure store
   setupStore(app);
-
+  await setupI18n(app);
+  await initAbpConfig();
   // Initialize internal system configuration
   initAppConfigStore();
 
@@ -36,7 +37,6 @@ async function bootstrap() {
 
   // Multilingual configuration
   // Asynchronous case: language files may be obtained from the server side
-  await setupI18n(app);
 
   // Configure routing
   setupRouter(app);

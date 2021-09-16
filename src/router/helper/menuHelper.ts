@@ -2,9 +2,10 @@ import { AppRouteModule } from '/@/router/types';
 import type { MenuModule, Menu, AppRouteRecordRaw } from '/@/router/types';
 import { findPath, treeMap } from '/@/utils/helper/treeHelper';
 import { cloneDeep } from 'lodash-es';
-import { isUrl } from '/@/utils/is';
+import { isFunction, isUrl } from '/@/utils/is';
 import { RouteParams } from 'vue-router';
 import { toRaw } from 'vue';
+import { useAbp } from '/@/hooks/abp/useAbp';
 
 export function getAllParentPath<T = Recordable>(treeData: T[], path: string) {
   const menuList = findPath(treeData, (n) => n.path === path) as Menu[];
@@ -40,7 +41,7 @@ export function transformMenuModule(menuModule: MenuModule): Menu {
 export function transformRouteToMenu(routeModList: AppRouteModule[], routerMapping = false) {
   const cloneRouteModList = cloneDeep(routeModList);
   const routeList: AppRouteRecordRaw[] = [];
-
+  const l = useAbp().getLocalization;
   cloneRouteModList.forEach((item) => {
     if (routerMapping && item.meta.hideChildrenInMenu && typeof item.redirect === 'string') {
       item.path = item.redirect;
@@ -55,12 +56,11 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
   const list = treeMap(routeList, {
     conversion: (node: AppRouteRecordRaw) => {
       const { meta: { title, hideMenu = false } = {} } = node;
-
       return {
         ...(node.meta || {}),
-        meta: node.meta,
-        name: title,
-        hideMenu,
+        meta: { ...node.meta, hideMenu: isFunction(hideMenu) ? hideMenu() : hideMenu },
+        name: title && title.indexOf('::') >= 0 ? l(title) : title,
+        hideMenu: isFunction(hideMenu) ? hideMenu() : hideMenu,
         path: node.path,
         ...(node.redirect ? { redirect: node.redirect } : {}),
       };

@@ -1,14 +1,12 @@
-import type { LocaleType } from '/#/config';
-
 import { set } from 'lodash-es';
 
-export const loadLocalePool: LocaleType[] = [];
+export const loadLocalePool: string[] = [];
 
-export function setHtmlPageLang(locale: LocaleType) {
+export function setHtmlPageLang(locale: string) {
   document.querySelector('html')?.setAttribute('lang', locale);
 }
 
-export function setLoadLocalePool(cb: (loadLocalePool: LocaleType[]) => void) {
+export function setLoadLocalePool(cb: (loadLocalePool: string[]) => void) {
   cb(loadLocalePool);
 }
 
