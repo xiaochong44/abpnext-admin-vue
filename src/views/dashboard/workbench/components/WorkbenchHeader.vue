@@ -8,7 +8,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { computed } from 'vue';
   import { Avatar } from 'ant-design-vue';
   import { useAppStore } from '/@/store/modules/app';
   import headerImg from '/@/assets/images/header.jpg';

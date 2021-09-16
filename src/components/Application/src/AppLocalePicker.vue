@@ -20,7 +20,7 @@
 <script lang="ts" setup>
   import type { LocaleType } from '/#/config';
   import type { DropMenu } from '/@/components/Dropdown';
-  import { ref, watchEffect, unref, computed } from 'vue';
+  import { unref, computed } from 'vue';
   import { Dropdown } from '/@/components/Dropdown';
   import { Icon } from '/@/components/Icon';
   import { useLocale } from '/@/locales/useLocale';
